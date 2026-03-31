@@ -15,6 +15,7 @@ public record ProductResponse(
         String image,
         ProductCategory category,
         ProductStatus status,
+        boolean available,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) {
@@ -28,6 +29,7 @@ public record ProductResponse(
                 p.getImage(),
                 p.getCategory(),
                 p.getStatus(),
+                p.getAvailable(),
                 p.getCreatedAt(),
                 p.getUpdatedAt()
         );
