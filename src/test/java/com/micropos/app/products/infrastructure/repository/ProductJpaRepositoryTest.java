@@ -6,8 +6,9 @@ import com.micropos.app.products.infrastructure.entity.ProductEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
+import org.springframework.boot.data.jpa.test.autoconfigure.*;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
+import org.springframework.boot.persistence.autoconfigure.EntityScan;
 import org.springframework.test.annotation.Commit;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -17,9 +18,9 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+
 @DataJpaTest
 @ActiveProfiles("test")
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class ProductJpaRepositoryTest {
 
     @Autowired
@@ -30,22 +31,27 @@ class ProductJpaRepositoryTest {
     @BeforeEach
     void setup() {
         product = ProductEntity.builder()
-                .name("Pepsi")
-                .description("Bebida")
-                .price(new BigDecimal("20"))
+                .sku("BEER-TEST001" )
+                .name("Cerveza 001" )
+                .description("Bebida carbonatada")
+                .price(new BigDecimal("3500.00"))
                 .status(ProductStatus.ACTIVE)
                 .category(ProductCategory.BEERS)
                 .build();
 
+        // repository.deleteAll();
+
     }
 
     @Test
-    void shouldSavedProduct() {
+    void savePersistProduct() {
 
         ProductEntity savedProduct = repository.save(product);
 
         assertNotNull(savedProduct.getId());
-        assertEquals("Pepsi", savedProduct.getName());
+        assertEquals("Cerveza 001", savedProduct.getName());
+        assertNotNull(savedProduct.getCreatedAt());
+        assertNotNull(savedProduct.getUpdatedAt());
     }
 
     @Test
@@ -55,7 +61,17 @@ class ProductJpaRepositoryTest {
 
         assertTrue(foundProduct.isPresent());
         assertEquals(product, foundProduct.get());
+        assertEquals(product.getId(), foundProduct.get().getId());
+        assertEquals(product.getSku(), foundProduct.get().getSku());
     }
+
+    @Test
+    void shouldReturnEmptyWhenProductByIdNotExists() {
+        Optional<ProductEntity> foundProduct = repository.findById(999L);
+        assertFalse(foundProduct.isPresent());
+
+    }
+
     @Test
     void shouldFindAllProducts() {
         repository.save(product);
