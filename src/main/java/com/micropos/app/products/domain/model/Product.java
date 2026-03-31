@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Data
 @Builder
@@ -28,13 +29,33 @@ public class Product {
     private LocalDateTime updatedAt;
     private LocalDateTime deletedAt;
 
-    public void deactive(){
-        this.status = ProductStatus.INACTIVE;
+    public boolean getAvailable() {
+        return ProductStatus.ACTIVE.equals(this.status);
+    }
+
+    public void deactivate() {
+        this.status    = ProductStatus.INACTIVE;
         this.deletedAt = LocalDateTime.now();
     }
 
-    public void active(){
-        this.status = ProductStatus.ACTIVE;
+    public void activate() {
+        this.status    = ProductStatus.ACTIVE;
         this.deletedAt = null;
+    }
+
+    public void markOutOfStock() {
+        this.status = ProductStatus.OUT_OF_STOCK;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Product p)) return false;
+        return Objects.equals(sku, p.sku);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(sku);
     }
 }

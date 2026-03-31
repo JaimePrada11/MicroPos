@@ -11,7 +11,13 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "products")
+@Table(name = "products",
+    indexes = {
+            @Index(name = "idx_products_sku", columnList = "sku", unique = true),
+            @Index(name="idx_products_status", columnList="status"),
+            @Index(name="idx_products_category", columnList="category")
+    }
+)
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -21,6 +27,9 @@ public class ProductEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false, unique = true, length = 30)
+    private String sku;
 
     @Column(nullable = false, length = 150)
     private String name;
@@ -51,4 +60,9 @@ public class ProductEntity {
     private LocalDateTime updatedAt;
 
     private LocalDateTime deletedAt;
+
+    @Transient
+    public boolean isAvailable(){
+        return ProductStatus.ACTIVE.equals(this.status);
+    }
 }

@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 @Service
 @AllArgsConstructor
 public class ProductServiceImp implements ProductService {
-    private ProductMapper productMapper;
     private final ProductRepository productRepository;
 
     @Override
@@ -66,12 +65,15 @@ public class ProductServiceImp implements ProductService {
         Product update = Product.builder()
                 .id(productExits.getId())
                 .sku(productExits.getSku())
-                .name(request.name())
-                .description(request.description())
-                .price(request.price())
-                .image(request.image())
-                .category(request.category())
+                .name(request.name() != null ? request.name() : productExits.getName())
+                .description(request.description() != null ? request.description() : productExits.getDescription())
+                .price(request.price() != null ? request.price() : productExits.getPrice())
+                .image(request.image() != null ? request.image() : productExits.getImage())
+                .category(request.category() != null ? request.category() : productExits.getCategory())
                 .build();
+        if (request.status() != null) {
+            update.setStatus(request.status());
+        }
 
         return productRepository.save(update);
     }
@@ -81,7 +83,7 @@ public class ProductServiceImp implements ProductService {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException(id));
 
-        product.deactive();
+        product.deactivate();
         productRepository.save(product);
     }
 }

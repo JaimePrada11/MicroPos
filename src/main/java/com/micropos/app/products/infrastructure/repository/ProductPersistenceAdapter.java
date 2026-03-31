@@ -5,6 +5,8 @@ import com.micropos.app.products.domain.repository.ProductRepository;
 import com.micropos.app.products.infrastructure.entity.ProductEntity;
 import com.micropos.app.products.infrastructure.mapper.ProductMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -28,21 +30,30 @@ public class ProductPersistenceAdapter implements ProductRepository {
 
     @Override
     public Optional<Product> findById(Long id) {
-        return Optional.empty();
+        return jpaRepository.findById(id)
+                .map(productMapper::toDomain);
     }
 
     @Override
-    public List<Product> findAll() {
-        return List.of();
+    public Optional<Product> findBySku(String sku) {
+        return jpaRepository.findBySku(sku)
+                .map(productMapper::toDomain);
     }
 
     @Override
-    public boolean existsByName(String name) {
-        return false;
+    public Page<Product> findAll(Pageable pageable) {
+        return jpaRepository.findAll(pageable)
+                .map(productMapper::toDomain);
     }
+
+    @Override
+    public boolean existsBySku(String sku) {
+        return jpaRepository.existsBySku(sku);
+    }
+
 
     @Override
     public void deleteById(Long id) {
-
+        jpaRepository.deleteById(id);
     }
 }
